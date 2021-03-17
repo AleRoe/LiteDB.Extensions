@@ -3,7 +3,7 @@
 Provides extension methods for registering and customizing a LiteDB.LiteDabase singleton instance using Microsoft.Extensions.DependencyInjection.
 
 ### Installation
-
+NuGet package to follow shortly.
 
 ### Basic usage
 
@@ -12,9 +12,9 @@ Provides extension methods for registering and customizing a LiteDB.LiteDabase s
 services.AddLiteDatabase();
 
 //Retrieve
-database = provider.GetRequiredService<LiteDatabase>()
+var database = provider.GetRequiredService<LiteDatabase>()
 ```
-This will register a singlton LiteDatabase instance using the connection string provided in your appsettings.json file under the `ConnectionStrings:LiteDatabase` key. 
+This will register a singleton LiteDatabase instance using the connection string provided in your appsettings.json file under the `ConnectionStrings:LiteDatabase` key. 
 The default registration requires that this key is present, otherwise a AgrumentNullException will be thrown. 
 The LiteDatabase instance is configured using the default `BsonMapper.Global` settings and will use an `ILogger` instance for logging if configured.
 

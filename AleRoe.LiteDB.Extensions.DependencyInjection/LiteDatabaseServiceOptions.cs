@@ -28,7 +28,7 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection
         /// <summary>
         /// The <see cref="ConnectionString"/> connection string for the LiteDb database
         /// </summary>
-        public ConnectionString ConnectionString { get; set; } = new ();
+        public ConnectionString ConnectionString { get; set; } = new ConnectionString();
 
         /// <summary>
         /// The <see cref="BsonMapper"/> class used to convert entities to and from BsonDocument

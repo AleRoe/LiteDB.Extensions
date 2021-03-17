@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFrameworks>net5.0;netcoreapp3.1;net48</TargetFrameworks>
     <Version>0.0.9</Version>
     <Authors>Alexander Röthinger</Authors>
     <Company>AleRoe</Company>
@@ -13,6 +13,7 @@
     <RepositoryUrl>https://github.com/AleRoe/LiteDB.Extensions</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>

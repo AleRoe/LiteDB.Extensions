@@ -8,7 +8,11 @@ Provides extension methods for registering and customizing a LiteDB.LiteDabase s
 ### Basic usage
 
 ```csharp
+//Register
 services.AddLiteDatabase();
+
+//Retrieve
+database = provider.GetRequiredService<LiteDatabase>()
 ```
 This will register a singlton LiteDatabase instance using the connection string provided in your appsettings.json file under the `ConnectionStrings:LiteDatabase` key. 
 The default registration requires that this key is present, otherwise a AgrumentNullException will be thrown. 

@@ -63,6 +63,7 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection.Tests
                 .AddLiteDatabase(configure =>
                 {
                     configure.ConnectionString.Filename = ConnectionString;
+                    configure.Mapper.EmptyStringToNull = false;
                 })
                 .BuildServiceProvider();
 

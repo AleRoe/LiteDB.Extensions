@@ -16,88 +16,95 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection.Tests
         [Test()]
         public void AddLiteDatabaseTest_Default()
         {
-            using var provider = new ServiceCollection()
+            using (var provider = new ServiceCollection()
                 .AddLiteDatabase()
                 .AddSingleton<IConfiguration>(Configuration)
-                .BuildServiceProvider();
-
-            Assert.DoesNotThrow(() => provider.GetRequiredService<LiteDatabase>());
+                .BuildServiceProvider())
+            {
+                Assert.DoesNotThrow(() => provider.GetRequiredService<LiteDatabase>());
+            }
         }
 
         [Test()]
         public void AddLiteDatabaseTest_Default_MissingConnectionStringThrows()
         {
-            using var provider = new ServiceCollection()
+            using (var provider = new ServiceCollection()
                 .AddLiteDatabase()
                 .AddSingleton<IConfiguration>(EmptyConfiguration)
-                .BuildServiceProvider();
-
-            Assert.Throws<ArgumentNullException>(() => provider.GetRequiredService<LiteDatabase>());
+                .BuildServiceProvider())
+            {
+                Assert.Throws<ArgumentNullException>(() => provider.GetRequiredService<LiteDatabase>());
+            }
         }
 
         [Test()]
         public void AddLiteDatabaseTest_WithOptions()
         {
             var options = new LiteDatabaseServiceOptions(ConnectionString);
-            using var provider = new ServiceCollection()
+            using (var provider = new ServiceCollection()
                 .AddLiteDatabase(options)
-                .BuildServiceProvider();
-
-            Assert.DoesNotThrow(() => provider.GetRequiredService<LiteDatabase>());
+                .BuildServiceProvider())
+            {
+                Assert.DoesNotThrow(() => provider.GetRequiredService<LiteDatabase>());
+            }
         }
 
         [Test()]
         public void AddLiteDatabaseTest_WithConnectionString()
         {
-            using var provider = new ServiceCollection()
+            using (var provider = new ServiceCollection()
                 .AddLiteDatabase(ConnectionString)
-                .BuildServiceProvider();
-
-            Assert.DoesNotThrow(() => provider.GetRequiredService<LiteDatabase>());
+                .BuildServiceProvider())
+            {
+                Assert.DoesNotThrow(() => provider.GetRequiredService<LiteDatabase>());
+            }
         }
 
         [Test()]
         public void AddLiteDatabaseTest_WithConfigure()
         {
-            using var provider = new ServiceCollection()
+
+            using (var provider = new ServiceCollection()
                 .AddLiteDatabase(configure =>
                 {
                     configure.ConnectionString.Filename = ConnectionString;
                     configure.Mapper.EmptyStringToNull = false;
                 })
-                .BuildServiceProvider();
-
-            Assert.DoesNotThrow(() => provider.GetRequiredService<LiteDatabase>());
+                .BuildServiceProvider())
+            {
+                Assert.DoesNotThrow(() => provider.GetRequiredService<LiteDatabase>());
+            }
         }
 
         [Test()]
         public void AddLiteDatabaseTest_WithPostConfigure()
         {
-            using var provider = new ServiceCollection()
+            using (var provider = new ServiceCollection()
                 .AddLiteDatabase()
                 .AddSingleton<IConfiguration>(Configuration)
                 .ConfigureOptions<ConfigureLiteDatabaseServiceOptions>()
-                .BuildServiceProvider();
-
-            LiteDatabase database = null;
-            Assert.DoesNotThrow(() => database = provider.GetRequiredService<LiteDatabase>());
-            Assert.IsFalse(database.Mapper.EmptyStringToNull);
+                .BuildServiceProvider())
+            {
+                LiteDatabase database = null;
+                Assert.DoesNotThrow(() => database = provider.GetRequiredService<LiteDatabase>());
+                Assert.IsFalse(database.Mapper.EmptyStringToNull);
+            }
         }
 
         [Test()]
         public void AddLiteDatabaseTest_Default_SupportsLogging()
         {
-            using var provider = new ServiceCollection()
+
+            using (var provider = new ServiceCollection()
                 .AddLiteDatabase()
                 .AddSingleton(Configuration)
                 .AddLogging()
-                .BuildServiceProvider();
-            
-            Assert.DoesNotThrow(() => provider.GetRequiredService<LiteDatabase>());
-            
-            var options = provider.GetRequiredService<IOptions<LiteDatabaseServiceOptions>>();
-            Assert.IsNotNull(options.Value.Logger);
-
+                .BuildServiceProvider())
+            {
+                Assert.DoesNotThrow(() => provider.GetRequiredService<LiteDatabase>());
+                var options = provider.GetRequiredService<IOptions<LiteDatabaseServiceOptions>>();
+                Assert.IsNotNull(options.Value.Logger);
+            }
         }
 
         internal class ConfigureLiteDatabaseServiceOptions : IConfigureOptions<LiteDatabaseServiceOptions>
@@ -108,20 +115,20 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection.Tests
             }
         }
 
-        public IConfiguration Configuration
+        private static IConfiguration Configuration
         {
             get
             {
                 var configuration = new Dictionary<string, string>
                 {
-                    {LiteDatabaseServiceExtensions.LiteDatabaseConnectionStringKey, ConnectionString}
+                    {$"ConnectionStrings:{LiteDatabaseServiceExtensions.LiteDatabaseConnectionStringKey}", ConnectionString}
                 };
                 var builder = new ConfigurationBuilder().AddInMemoryCollection(configuration);
                 return builder.Build();
             }
         }
 
-        public IConfiguration EmptyConfiguration
+        private static IConfiguration EmptyConfiguration
         {
             get
             {

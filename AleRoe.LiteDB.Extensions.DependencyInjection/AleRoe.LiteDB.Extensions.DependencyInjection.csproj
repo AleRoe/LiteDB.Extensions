@@ -2,18 +2,21 @@
 
   <PropertyGroup>
     <TargetFrameworks>net5.0;netcoreapp3.1;net48</TargetFrameworks>
-    <Version>0.0.9</Version>
+    <Version>0.0.91</Version>
     <Authors>Alexander Röthinger</Authors>
     <Company>AleRoe</Company>
     <Description>Provides extension methods for registering and customizing a LiteDB.LiteDabase singleton instance using Microsoft.Extensions.DependencyInjection.</Description>
     <Copyright>Alexander Röthinger, 2021</Copyright>
-    <PackageProjectUrl>https://github.com/AleRoe/LiteDB.Extensions</PackageProjectUrl>
+    <PackageProjectUrl>https://aleroe.github.io/LiteDB.Extensions</PackageProjectUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	  <PackageOutputPath>C:\Users\Alexander\Source\LocalPackages</PackageOutputPath>
     <RepositoryUrl>https://github.com/AleRoe/LiteDB.Extensions</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
+    <AssemblyVersion>0.0.9.0001</AssemblyVersion>
+    <FileVersion>0.0.9.0001</FileVersion>
+    <PackageTags>dependency-injection;extension-methods;litedb;microsoft-extensions;litedb-extension</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

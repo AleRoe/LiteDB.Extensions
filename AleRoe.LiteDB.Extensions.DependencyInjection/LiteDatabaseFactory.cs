@@ -25,8 +25,12 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection
         }
 
         /// <inheritdoc/>
+        /// <exception cref="System.ArgumentException">LiteDB.Database connection string is invalid. - Filename</exception>
         public LiteDatabase Create()
         {
+            if (string.IsNullOrEmpty(options.ConnectionString.Filename))
+                throw new ArgumentException("LiteDB.Database connection string is invalid.", nameof(ConnectionString.Filename));
+            
             options.Logger?.LogInformation($"Using database {options.ConnectionString.Filename}");
             return new LiteDatabase(options.ConnectionString, options.Mapper);
         }

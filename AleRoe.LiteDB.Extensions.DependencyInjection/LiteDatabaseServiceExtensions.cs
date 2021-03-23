@@ -12,7 +12,7 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection
     /// </summary>
     public static class LiteDatabaseServiceExtensions
     {
-        public const string LiteDatabaseConnectionStringKey = "ConnectionStrings:LiteDatabase";
+        public const string LiteDatabaseConnectionStringKey = "LiteDatabase";
         public const string LiteDatabaseLoggerCategory = "LiteDB.LiteDatabase";
 
         /// <summary>
@@ -21,6 +21,7 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection" /> to add the services to.</param>
         /// <returns>The <see cref="IServiceCollection"/> so that calls can be chained.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
         public static IServiceCollection AddLiteDatabase(this IServiceCollection services)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
@@ -29,11 +30,13 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection
             services.AddOptions<LiteDatabaseServiceOptions>()
                 .Configure<IConfiguration>((options, configuration) =>
                 {
-                    var connectionString = configuration.GetValue<string>(LiteDatabaseConnectionStringKey) ??
-                                           throw new ArgumentNullException(LiteDatabaseConnectionStringKey, "The configuration does not contain a valid connection string.");
+                    var connectionString = configuration.GetConnectionString(LiteDatabaseConnectionStringKey);
+                    if (string.IsNullOrEmpty(connectionString))
+                        throw new ArgumentNullException(LiteDatabaseConnectionStringKey, "The configuration does not contain a valid connection string.");
+
                     options.ConnectionString = new ConnectionString(connectionString);
                 });
-            
+
             return services;
         }
 
@@ -107,6 +110,13 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection
                 {
                     var factory = provider.GetService<ILoggerFactory>();
                     options.Logger = factory?.CreateLogger(LiteDatabaseLoggerCategory);
+
+                    var configuration = provider.GetService<IConfiguration>();
+                    if (configuration != null)
+                    {
+                        var connectionString = configuration.GetConnectionString(LiteDatabaseConnectionStringKey);
+                        options.ConnectionString = new ConnectionString(connectionString);
+                    }
                 });
             services.TryAddTransient<ILiteDatabaseFactory, LiteDatabaseFactory>();
             services.TryAddSingleton<LiteDatabase>(provider =>

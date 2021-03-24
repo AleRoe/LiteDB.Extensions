@@ -7,6 +7,7 @@ Provides extension methods for registering and customizing a LiteDB.LiteDabase s
 Install-Package AleRoe.LiteDB.Extensions.DependencyInjection
 ```
 
+
 ### Basic usage
 
 ```csharp

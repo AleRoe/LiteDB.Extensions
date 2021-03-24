@@ -2,8 +2,11 @@
 
 Provides extension methods for registering and customizing a LiteDB.LiteDabase singleton instance using Microsoft.Extensions.DependencyInjection.
 
-### Installation
-NuGet package to follow shortly.
+### Installing via NuGet
+
+```csharp
+Install-Package AleRoe.LiteDB.Extensions.DependencyInjection
+```
 
 ### Basic usage
 

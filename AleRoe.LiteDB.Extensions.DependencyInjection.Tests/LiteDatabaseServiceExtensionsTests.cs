@@ -48,11 +48,35 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection.Tests
                 Assert.DoesNotThrow(() => provider.GetRequiredService<LiteDatabase>());
             }
         }
+        [Test()]
+        public void AddLiteDatabaseTest_WithOptions_EmptyConfiguration()
+        {
+            var options = new LiteDatabaseServiceOptions(ConnectionString);
+            using (var provider = new ServiceCollection()
+                .AddSingleton<IConfiguration>(EmptyConfiguration)
+                .AddLiteDatabase(options)
+                .BuildServiceProvider())
+            {
+                Assert.DoesNotThrow(() => provider.GetRequiredService<LiteDatabase>());
+            }
+        }
 
         [Test()]
         public void AddLiteDatabaseTest_WithConnectionString()
         {
             using (var provider = new ServiceCollection()
+                .AddLiteDatabase(ConnectionString)
+                .BuildServiceProvider())
+            {
+                Assert.DoesNotThrow(() => provider.GetRequiredService<LiteDatabase>());
+            }
+        }
+
+        [Test()]
+        public void AddLiteDatabaseTest_WithConnectionString_EmptyConfiguration()
+        {
+            using (var provider = new ServiceCollection()
+                .AddSingleton<IConfiguration>(EmptyConfiguration)
                 .AddLiteDatabase(ConnectionString)
                 .BuildServiceProvider())
             {
@@ -75,6 +99,21 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection.Tests
                 Assert.DoesNotThrow(() => provider.GetRequiredService<LiteDatabase>());
             }
         }
+        [Test()]
+        public void AddLiteDatabaseTest_WithConfigure_EmptyConfiguration()
+        {
+            using (var provider = new ServiceCollection()
+                .AddSingleton<IConfiguration>(EmptyConfiguration)
+                .AddLiteDatabase(configure =>
+                {
+                    configure.ConnectionString.Filename = ConnectionString;
+                    configure.Mapper.EmptyStringToNull = false;
+                })
+                .BuildServiceProvider())
+            {
+                Assert.DoesNotThrow(() => provider.GetRequiredService<LiteDatabase>());
+            }
+        }
 
         [Test()]
         public void AddLiteDatabaseTest_WithPostConfigure()
@@ -83,6 +122,35 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection.Tests
                 .AddLiteDatabase()
                 .AddSingleton<IConfiguration>(Configuration)
                 .ConfigureOptions<ConfigureLiteDatabaseServiceOptions>()
+                .BuildServiceProvider())
+            {
+                LiteDatabase database = null;
+                Assert.DoesNotThrow(() => database = provider.GetRequiredService<LiteDatabase>());
+                Assert.IsFalse(database.Mapper.EmptyStringToNull);
+            }
+        }
+
+        [Test()]
+        public void AddLiteDatabaseTest_WithPostConfigure_ConnectionString()
+        {
+            using (var provider = new ServiceCollection()
+                .AddLiteDatabase()
+                .AddSingleton<IConfiguration>(Configuration)
+                .ConfigureOptions<ConfigureLiteDatabaseServiceOptionsConnString>()
+                .BuildServiceProvider())
+            {
+                LiteDatabase database = null;
+                Assert.DoesNotThrow(() => database = provider.GetRequiredService<LiteDatabase>());
+                Assert.IsFalse(database.Mapper.EmptyStringToNull);
+            }
+        }
+        [Test()]
+        public void AddLiteDatabaseTest_WithPostConfigure_EmptyConfiguration()
+        {
+            using (var provider = new ServiceCollection()
+                .AddLiteDatabase()
+                .AddSingleton<IConfiguration>(EmptyConfiguration)
+                .ConfigureOptions<ConfigureLiteDatabaseServiceOptionsConnString>()
                 .BuildServiceProvider())
             {
                 LiteDatabase database = null;
@@ -111,6 +179,14 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection.Tests
         {
             public void Configure(LiteDatabaseServiceOptions options)
             {
+                options.Mapper.EmptyStringToNull = false;
+            }
+        }
+        internal class ConfigureLiteDatabaseServiceOptionsConnString : IConfigureOptions<LiteDatabaseServiceOptions>
+        {
+            public void Configure(LiteDatabaseServiceOptions options)
+            {
+                options.ConnectionString = new ConnectionString(":memory:");
                 options.Mapper.EmptyStringToNull = false;
             }
         }

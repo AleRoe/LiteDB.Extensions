@@ -17,8 +17,8 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection.Tests
         public void AddLiteDatabaseTest_Default()
         {
             using (var provider = new ServiceCollection()
-                .AddLiteDatabase()
                 .AddSingleton<IConfiguration>(Configuration)
+                .AddLiteDatabase()
                 .BuildServiceProvider())
             {
                 Assert.DoesNotThrow(() => provider.GetRequiredService<LiteDatabase>());
@@ -29,8 +29,8 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection.Tests
         public void AddLiteDatabaseTest_Default_MissingConnectionStringThrows()
         {
             using (var provider = new ServiceCollection()
-                .AddLiteDatabase()
                 .AddSingleton<IConfiguration>(EmptyConfiguration)
+                .AddLiteDatabase()
                 .BuildServiceProvider())
             {
                 Assert.Throws<ArgumentNullException>(() => provider.GetRequiredService<LiteDatabase>());
@@ -116,12 +116,11 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection.Tests
         }
 
         [Test()]
-        public void AddLiteDatabaseTest_WithPostConfigure()
+        public void AddLiteDatabaseTest_WithConfigureOption()
         {
             using (var provider = new ServiceCollection()
-                .AddLiteDatabase()
                 .AddSingleton<IConfiguration>(Configuration)
-                .ConfigureOptions<ConfigureLiteDatabaseServiceOptions>()
+                .AddLiteDatabase<ConfigureLiteDatabaseServiceOptionsConnString>()
                 .BuildServiceProvider())
             {
                 LiteDatabase database = null;
@@ -131,26 +130,11 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection.Tests
         }
 
         [Test()]
-        public void AddLiteDatabaseTest_WithPostConfigure_ConnectionString()
+        public void AddLiteDatabaseTest_WithConfigureOption_EmptyConfiguration()
         {
             using (var provider = new ServiceCollection()
-                .AddLiteDatabase()
-                .AddSingleton<IConfiguration>(Configuration)
-                .ConfigureOptions<ConfigureLiteDatabaseServiceOptionsConnString>()
-                .BuildServiceProvider())
-            {
-                LiteDatabase database = null;
-                Assert.DoesNotThrow(() => database = provider.GetRequiredService<LiteDatabase>());
-                Assert.IsFalse(database.Mapper.EmptyStringToNull);
-            }
-        }
-        [Test()]
-        public void AddLiteDatabaseTest_WithPostConfigure_EmptyConfiguration()
-        {
-            using (var provider = new ServiceCollection()
-                .AddLiteDatabase()
                 .AddSingleton<IConfiguration>(EmptyConfiguration)
-                .ConfigureOptions<ConfigureLiteDatabaseServiceOptionsConnString>()
+                .AddLiteDatabase<ConfigureLiteDatabaseServiceOptionsConnString>()
                 .BuildServiceProvider())
             {
                 LiteDatabase database = null;

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AleRoe.LiteDB.Extensions.DependencyInjection
 {
@@ -95,6 +96,15 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection
             });
         }
 
+        public static IServiceCollection AddLiteDatabase<T>(this IServiceCollection services) where T : IConfigureOptions<LiteDatabaseServiceOptions>
+        {
+            if (services == null) throw new ArgumentNullException(nameof(services));
+
+            return services
+                .AddLiteDbCore()
+                .ConfigureOptions(typeof(T));
+        }
+
         /// <summary>
         /// Adds the core services for LiteDatabase.
         /// </summary>
@@ -105,19 +115,6 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection
             if (services == null) throw new ArgumentNullException(nameof(services));
 
             services.AddOptions();
-            services.AddOptions<LiteDatabaseServiceOptions>()
-                .Configure<IServiceProvider>((options, provider) =>
-                {
-                    var factory = provider.GetService<ILoggerFactory>();
-                    options.Logger = factory?.CreateLogger(LiteDatabaseLoggerCategory);
-
-                    var configuration = provider.GetService<IConfiguration>();
-                    if (configuration != null)
-                    {
-                        var connectionString = configuration.GetConnectionString(LiteDatabaseConnectionStringKey);
-                        options.ConnectionString = new ConnectionString(connectionString);
-                    }
-                });
             services.TryAddTransient<ILiteDatabaseFactory, LiteDatabaseFactory>();
             services.TryAddSingleton<LiteDatabase>(provider =>
             {

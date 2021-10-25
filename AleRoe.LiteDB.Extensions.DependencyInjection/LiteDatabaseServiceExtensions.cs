@@ -115,6 +115,12 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection
             if (services == null) throw new ArgumentNullException(nameof(services));
 
             services.AddOptions();
+            services.AddOptions<LiteDatabaseServiceOptions>()
+                .Configure<IServiceProvider>((options, provider) =>
+                {
+                    var factory = provider.GetService<ILoggerFactory>();
+                    options.Logger = factory?.CreateLogger(LiteDatabaseLoggerCategory);
+                });
             services.TryAddTransient<ILiteDatabaseFactory, LiteDatabaseFactory>();
             services.TryAddSingleton<LiteDatabase>(provider =>
             {

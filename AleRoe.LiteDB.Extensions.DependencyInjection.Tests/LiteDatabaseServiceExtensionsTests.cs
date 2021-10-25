@@ -116,6 +116,50 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection.Tests
         }
 
         [Test()]
+        public void AddLiteDatabaseTest_WithPostConfigure()
+        {
+            using (var provider = new ServiceCollection()
+                .AddSingleton<IConfiguration>(Configuration)
+                .AddLiteDatabase()
+                .ConfigureOptions<ConfigureLiteDatabaseServiceOptionsConnString>()
+                .BuildServiceProvider())
+            {
+                LiteDatabase database = null;
+                Assert.DoesNotThrow(() => database = provider.GetRequiredService<LiteDatabase>());
+                Assert.IsFalse(database.Mapper.EmptyStringToNull);
+            }
+        }
+
+        [Test()]
+        public void AddLiteDatabaseTest_WithPostConfigure_ConnectionString()
+        {
+            using (var provider = new ServiceCollection()
+                .AddSingleton<IConfiguration>(Configuration)
+                .AddLiteDatabase()
+                .ConfigureOptions<ConfigureLiteDatabaseServiceOptionsConnString>()
+                .BuildServiceProvider())
+            {
+                LiteDatabase database = null;
+                Assert.DoesNotThrow(() => database = provider.GetRequiredService<LiteDatabase>());
+                Assert.IsFalse(database.Mapper.EmptyStringToNull);
+            }
+        }
+
+        [Test()]
+        public void AddLiteDatabaseTest_WithPostConfigure_ConnectionString_EmptyConfiguration()
+        {
+            using (var provider = new ServiceCollection()
+                .AddSingleton<IConfiguration>(EmptyConfiguration)
+                .AddLiteDatabase()
+                .ConfigureOptions<ConfigureLiteDatabaseServiceOptionsConnString>()
+                .BuildServiceProvider())
+            {
+                LiteDatabase database = null;
+                Assert.Throws<ArgumentNullException>(() => database = provider.GetRequiredService<LiteDatabase>());
+            }
+        }
+
+        [Test()]
         public void AddLiteDatabaseTest_WithConfigureOption()
         {
             using (var provider = new ServiceCollection()

@@ -46,4 +46,12 @@ internal class ConfigureLiteDatabaseServiceOptions : IConfigureOptions<LiteDatab
 //...
 services.AddLiteDatabase();
 services.ConfigureOptions<ConfigureLiteDatabaseServiceOptions>()
+
+// Alternatively in one call
+services.AddLiteDatabase<ConfigureLiteDatabaseServiceOptions>();
 ```
+
+Configuring options can be called multiple times.
+
+#### A note on Logging
+LiteDB currently does really not support logging. If you pass an `ILogger` instance in  `LiteDatabaseServiceOptions` or use the `IServiceCollection.AddLogging()` extension, then this will only be used to log an information message with the filename of the database.  

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AleRoe.LiteDB.Extensions.DependencyInjection
 {
@@ -26,18 +27,8 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
-            services.AddLiteDatabase(configure => { });
-            services.AddOptions<LiteDatabaseServiceOptions>()
-                .Configure<IConfiguration>((options, configuration) =>
-                {
-                    var connectionString = configuration.GetConnectionString(LiteDatabaseConnectionStringKey);
-                    if (string.IsNullOrEmpty(connectionString))
-                        throw new ArgumentNullException(LiteDatabaseConnectionStringKey, "The configuration does not contain a valid connection string.");
-
-                    options.ConnectionString = new ConnectionString(connectionString);
-                });
-
-            return services;
+            return services
+                .AddLiteDbCore();
         }
 
         /// <summary>
@@ -68,12 +59,16 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
             if (options == null) throw new ArgumentNullException(nameof(options));
-
+            
             return services.AddLiteDatabase(configure =>
             {
                 configure.ConnectionString = options.ConnectionString;
                 configure.Mapper = options.Mapper;
-                configure.Logger = options.Logger;
+                if (options.Logger != null)
+                {
+                    configure.Logger = options.Logger;
+                }
+                
             });
         }
 
@@ -96,6 +91,22 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection
         }
 
         /// <summary>
+        /// Adds a singleton <see cref="LiteDatabase" /> service implementation to the services collection.
+        /// </summary>
+        /// <typeparam name="T">The <see cref="IConfigureOptions{LiteDatabaseServiceOptions}"/> type that will configure options.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection" /> to add the services to.</param>
+        /// <returns>The <see cref="IServiceCollection"/> so that calls can be chained.</returns>
+        /// <exception cref="System.ArgumentNullException">services</exception>
+        public static IServiceCollection AddLiteDatabase<T>(this IServiceCollection services) where T : IConfigureOptions<LiteDatabaseServiceOptions>
+        {
+            if (services == null) throw new ArgumentNullException(nameof(services));
+
+            return services
+                .AddLiteDbCore()
+                .ConfigureOptions(typeof(T));
+        }
+
+        /// <summary>
         /// Adds the core services for LiteDatabase.
         /// </summary>
         /// <param name="services">The services.</param>
@@ -115,7 +126,11 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection
                     if (configuration != null)
                     {
                         var connectionString = configuration.GetConnectionString(LiteDatabaseConnectionStringKey);
-                        options.ConnectionString = new ConnectionString(connectionString);
+                        if (connectionString != null)
+                        {
+                            options.ConnectionString = new ConnectionString(connectionString);
+                        }
+                        
                     }
                 });
             services.TryAddTransient<ILiteDatabaseFactory, LiteDatabaseFactory>();

@@ -1,0 +1,39 @@
+name: Continous Integration
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+defaults:
+  run:
+    working-directory: src
+
+jobs:
+  build:
+
+    env:
+      BUILD_CONFIG: 'Release'
+      
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 7.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+          
+    - name: Build
+      run: dotnet build --no-restore --configuration $BUILD_CONFIG
+          
+    - name: Test
+      run: dotnet test --configuration $BUILD_CONFIG --no-build

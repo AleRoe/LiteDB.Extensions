@@ -64,6 +64,7 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection
             {
                 configure.ConnectionString = options.ConnectionString;
                 configure.Mapper = options.Mapper;
+                options.DatabasePatches.ForEach(x => configure.AddDatabasePatch(x));
                 if (options.Logger != null)
                 {
                     configure.Logger = options.Logger;

@@ -52,6 +52,22 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection.Tests
         }
 
         [Test()]
+        public void AddLiteDatabaseTest_WithOptionsAndPatch()
+        {
+            var options = new LiteDatabaseServiceOptions(ConnectionString);
+            options.AddDatabasePatch(action => { action.UserVersion = 1; });
+            using (var provider = new ServiceCollection()
+                .AddLiteDatabase(options)
+                .BuildServiceProvider())
+            {
+                LiteDatabase database = null;
+                Assert.DoesNotThrow(() => database = provider.GetRequiredService<LiteDatabase>());
+                Assert.That(database.UserVersion, Is.EqualTo(1));
+            }
+        }
+
+
+        [Test()]
         public void AddLiteDatabaseTest_WithOptions_SupportsLogging()
         {
             var options = new LiteDatabaseServiceOptions(ConnectionString);
@@ -104,6 +120,41 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection.Tests
                 .BuildServiceProvider())
             {
                 Assert.DoesNotThrow(() => provider.GetRequiredService<LiteDatabase>());
+            }
+        }
+
+        [Test()]
+        public void AddLiteDatabaseTest_WithPatch()
+        {
+
+            using (var provider = new ServiceCollection()
+                .AddLiteDatabase(configure =>
+                {
+                    configure.ConnectionString.Filename = ConnectionString;
+                    configure.AddDatabasePatch(action => { action.UserVersion= 1; });
+                })
+                .BuildServiceProvider())
+            {
+                LiteDatabase database = null;
+                Assert.DoesNotThrow(() => database = provider.GetRequiredService<LiteDatabase>());
+                Assert.That(database.UserVersion, Is.EqualTo(1));
+            }
+        }
+
+        [Test()]
+        public void AddLiteDatabaseTest_WithPatchExceptionThrows()
+        {
+
+            using (var provider = new ServiceCollection()
+                .AddLiteDatabase(configure =>
+                {
+                    configure.ConnectionString.Filename = ConnectionString;
+                    configure.AddDatabasePatch(action => { throw new Exception(); });
+                })
+                .BuildServiceProvider())
+            {
+                LiteDatabase database = null;
+                Assert.Throws<LiteException>(() => database = provider.GetRequiredService<LiteDatabase>());
             }
         }
 

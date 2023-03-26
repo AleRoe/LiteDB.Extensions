@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using LiteDB;
 using Microsoft.Extensions.Logging;
 
@@ -9,6 +10,8 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection
     /// </summary>
     public class LiteDatabaseServiceOptions
     {
+
+        public List<Action<LiteDatabase>> DatabasePatches { get; } = new List<Action<LiteDatabase>>();
         /// <summary>
         /// Initializes a new instance of the <see cref="LiteDatabaseServiceOptions"/> class.
         /// </summary>
@@ -39,5 +42,11 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection
         /// Gets or sets the logger.
         /// </summary>
         public ILogger Logger { get; set; }
+
+        public LiteDatabaseServiceOptions AddDatabasePatch(Action<LiteDatabase> action) 
+        {
+            DatabasePatches.Add(action);
+            return this;
+        }
     }
 }

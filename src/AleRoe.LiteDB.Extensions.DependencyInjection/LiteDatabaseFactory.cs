@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using LiteDB;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -32,7 +33,29 @@ namespace AleRoe.LiteDB.Extensions.DependencyInjection
                 throw new ArgumentNullException("LiteDB.Database connection string is invalid.", nameof(ConnectionString.Filename));
             
             options.Logger?.LogInformation($"Using database {options.ConnectionString.Filename}");
-            return new LiteDatabase(options.ConnectionString, options.Mapper);
+            var database = new LiteDatabase(options.ConnectionString, options.Mapper);
+
+            if (options.DatabasePatches.Any())
+            {
+                try
+                {
+                    foreach (var item in options.DatabasePatches)
+                    {
+                        item.Invoke(database);
+                    }
+                    database.Commit();
+                }
+                catch (Exception e)
+                {
+                    database.Rollback();
+                    throw new LiteException(e.HResult, e.Message);
+                }
+                
+            }
+
+
+            return database;
+
         }
     }
 }
